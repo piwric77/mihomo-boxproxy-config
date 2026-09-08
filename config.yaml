@@ -1,8 +1,5 @@
-# Boxproxy / Mihomo：国内直连、国外自动选择、热点共享
-# 必改：下方订阅 URL。需要 Clash/Mihomo YAML 格式的节点订阅。
-# 配套说明见 使用说明.md。TProxy 已实测；eBPF 须由 BoxProxy 开启及生成入站。
-# 已静态检查用户提供的 APK：内置 boxctl/boxbpf；运行时入站由 APP 生成。
-# 地区分组思路参考 https://github.com/AIsouler/MyClash ，未直接套用其桌面 TUN 配置。
+# BoxProxy / Mihomo：国内外分流、IPv6、热点共享
+# 使用前替换 proxy-providers 中的订阅链接。
 mixed-port: 7890
 redir-port: 9797
 tproxy-port: 9898
@@ -10,7 +7,7 @@ allow-lan: true
 bind-address: '*'
 mode: rule
 log-level: info
-ipv6: false
+ipv6: true
 tcp-concurrent: true
 unified-delay: true
 find-process-mode: strict
@@ -21,8 +18,6 @@ profile:
   store-selected: true
   store-fake-ip: true
 
-# TProxy 已由用户实测能访问 Google；关闭自主 TUN，由 BoxProxy 管理转发。
-# 不要关闭 APP 的核心配置同步，也不要手工添加旧版 ebpf: 字段。
 tun:
   enable: false
   device: meta
@@ -53,8 +48,8 @@ dns:
   cache-algorithm: arc
   prefer-h3: false
   respect-rules: false
-  listen: 0.0.0.0:1053
-  ipv6: false
+  listen: '[::]:1053'
+  ipv6: true
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
@@ -94,7 +89,7 @@ dns:
 proxy-providers:
   机场订阅:
     type: http
-    url: 'https://example.com/REPLACE_WITH_YOUR_MIHOMO_SUBSCRIPTION'
+    url: '在此填入订阅链接'
     exclude-filter: '(?i)(剩余|到期|过期|流量|订阅|官网|客服|套餐|公告|重置|traffic|expire)'
     path: ./proxy_provider/my_subscription.yaml
     interval: 86400
@@ -265,7 +260,6 @@ proxy-groups:
     lazy: true
     empty-fallback: 'REJECT'
 
-# MRS 规则每日更新。经代理下载，避免首次直连 GitHub 失败。
 rule-providers:
   ads_domain:
     type: http
@@ -299,7 +293,6 @@ rule-providers:
     path: ./rule_provider/tg_ip.list
     interval: 86400
     proxy: 国外代理
-  # 内置常见 Google/YouTube 域名，启动时无需另行下载。
   google_domain:
     type: inline
     behavior: domain
@@ -341,9 +334,7 @@ rule-providers:
     proxy: 国外代理
 
 rules:
-  # 仅对进入核心的 DNS 有效；BoxProxy 还须接管手机和热点的 TCP/UDP 53。
   - DST-PORT,53,DNS_Hijack
-  # 阻止进入核心的常见 DoT/DoQ 端口；应用内 DoH 需在应用中关闭。
   - DST-PORT,853,REJECT
   - DOMAIN-SUFFIX,lan,DIRECT
   - DOMAIN-SUFFIX,local,DIRECT
@@ -359,12 +350,9 @@ rules:
   - IP-CIDR6,::1/128,DIRECT,no-resolve
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
-  # PASS 表示关闭去广告并继续匹配后续规则，不会强制直连。
+  - IP-CIDR6,ff00::/8,DIRECT,no-resolve
   - RULE-SET,ads_domain,去广告
-  # Google 兼容处理：拒绝匹配域名的 UDP/443，供支持回退的客户端改用 TCP。
-  # 若要恢复这些域名的 QUIC，注释下一行即可。
   - AND,((NETWORK,UDP),(DST-PORT,443),(RULE-SET,google_domain)),REJECT
-  # AI 在 Google 前匹配，Gemini/AI Studio 使用 AI 出口。
   - RULE-SET,ai_domain,AI
   - RULE-SET,tg_domain,Telegram
   - RULE-SET,tg_ip,Telegram,no-resolve
