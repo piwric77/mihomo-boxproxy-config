@@ -1,0 +1,374 @@
+# Boxproxy / Mihomo：国内直连、国外自动选择、热点共享
+# 必改：下方订阅 URL。需要 Clash/Mihomo YAML 格式的节点订阅。
+# 配套说明见 使用说明.md。TProxy 已实测；eBPF 须由 BoxProxy 开启及生成入站。
+# 已静态检查用户提供的 APK：内置 boxctl/boxbpf；运行时入站由 APP 生成。
+# 地区分组思路参考 https://github.com/AIsouler/MyClash ，未直接套用其桌面 TUN 配置。
+mixed-port: 7890
+redir-port: 9797
+tproxy-port: 9898
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: info
+ipv6: false
+tcp-concurrent: true
+unified-delay: true
+find-process-mode: strict
+external-controller: 127.0.0.1:9090
+external-ui: ./dashboard
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+# TProxy 已由用户实测能访问 Google；关闭自主 TUN，由 BoxProxy 管理转发。
+# 不要关闭 APP 的核心配置同步，也不要手工添加旧版 ebpf: 字段。
+tun:
+  enable: false
+  device: meta
+  stack: gvisor
+  auto-route: false
+  auto-redirect: false
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+
+sniffer:
+  enable: true
+  override-destination: false
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - '+.lan'
+    - '+.local'
+
+dns:
+  enable: true
+  cache-algorithm: arc
+  prefer-h3: false
+  respect-rules: false
+  listen: 0.0.0.0:1053
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - 'localhost'
+    - '+.ntp.org'
+    - '+.pool.ntp.org'
+    - 'time.*.com'
+    - 'time.*.gov'
+  default-nameserver:
+    - https://223.5.5.5/dns-query
+    - https://1.12.12.12/dns-query
+  proxy-server-nameserver:
+    - https://223.5.5.5/dns-query#DIRECT
+    - https://1.12.12.12/dns-query#DIRECT
+  direct-nameserver:
+    - https://223.5.5.5/dns-query#DIRECT
+    - https://1.12.12.12/dns-query#DIRECT
+  nameserver-policy:
+    'rule-set:ai_domain':
+      - 'https://1.1.1.1/dns-query#AI'
+      - 'https://8.8.8.8/dns-query#AI'
+    'rule-set:tg_domain':
+      - 'https://1.1.1.1/dns-query#Telegram'
+      - 'https://8.8.8.8/dns-query#Telegram'
+    'rule-set:google_domain':
+      - 'https://1.1.1.1/dns-query#Google'
+      - 'https://8.8.8.8/dns-query#Google'
+    'rule-set:cn_domain':
+      - https://223.5.5.5/dns-query#DIRECT
+      - https://1.12.12.12/dns-query#DIRECT
+  nameserver:
+    - 'https://1.1.1.1/dns-query#国外代理'
+    - 'https://8.8.8.8/dns-query#国外代理'
+
+proxy-providers:
+  机场订阅:
+    type: http
+    url: 'https://example.com/REPLACE_WITH_YOUR_MIHOMO_SUBSCRIPTION'
+    exclude-filter: '(?i)(剩余|到期|过期|流量|订阅|官网|客服|套餐|公告|重置|traffic|expire)'
+    path: ./proxy_provider/my_subscription.yaml
+    interval: 86400
+    proxy: DIRECT
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 600
+      timeout: 5000
+      lazy: true
+
+proxies:
+  - name: DNS_Hijack
+    type: dns
+
+proxy-groups:
+  - name: '国外代理'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png'
+    type: 'select'
+    proxies: ["自动选择", "美国", "香港", "日本", "台湾", "新加坡", "其他节点", "手动选择"]
+
+  - name: 'Google'
+    type: select
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png'
+    proxies: ['国外代理', '美国', '香港', '日本', '台湾', '新加坡', '手动选择']
+
+  - name: 'AI'
+    type: select
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
+    proxies: ['国外代理', '美国', '日本', '新加坡', '台湾', '香港']
+    use: ['机场订阅']
+    empty-fallback: REJECT
+
+  - name: 'Telegram'
+    type: select
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png'
+    proxies: ['国外代理', '美国', '日本', '新加坡', '台湾', '香港']
+    use: ['机场订阅']
+    empty-fallback: REJECT
+
+  - name: '去广告'
+    type: select
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png'
+    proxies: [REJECT, PASS]
+
+  - name: '美国'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
+    type: 'select'
+    proxies: ["美国-自动选择"]
+    use: ["机场订阅"]
+    filter: '(?i)(🇺🇸|美国|美國|洛杉矶|洛杉磯|纽约|紐約|西雅图|西雅圖|圣何塞|旧金山|舊金山|(^|[^a-z])usa?([^a-z]|$)|united\s*states|america)'
+
+  - name: '香港'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png'
+    type: 'select'
+    proxies: ["香港-自动选择"]
+    use: ["机场订阅"]
+    filter: '(?i)(🇭🇰|香港|(^|[^a-z])hkg?([^a-z]|$)|hong\s*kong)'
+
+  - name: '日本'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png'
+    type: 'select'
+    proxies: ["日本-自动选择"]
+    use: ["机场订阅"]
+    filter: '(?i)(🇯🇵|日本|东京|東京|大阪|(^|[^a-z])jpn?([^a-z]|$)|japan)'
+
+  - name: '台湾'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png'
+    type: 'select'
+    proxies: ["台湾-自动选择"]
+    use: ["机场订阅"]
+    filter: '(?i)(🇹🇼|台湾|台灣|臺灣|台北|臺北|高雄|(^|[^a-z])twn?([^a-z]|$)|taiwan)'
+
+  - name: '新加坡'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png'
+    type: 'select'
+    proxies: ["新加坡-自动选择"]
+    use: ["机场订阅"]
+    filter: '(?i)(🇸🇬|新加坡|狮城|獅城|(^|[^a-z])sgp?([^a-z]|$)|singapore)'
+
+  - name: '手动选择'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png'
+    type: 'select'
+    use: ["机场订阅"]
+    empty-fallback: 'REJECT'
+
+  - name: '其他节点'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/World_Map.png'
+    type: 'select'
+    use: ["机场订阅"]
+    exclude-filter: '(?i)(🇺🇸|美国|美國|洛杉矶|洛杉磯|纽约|紐約|西雅图|西雅圖|圣何塞|旧金山|舊金山|(^|[^a-z])usa?([^a-z]|$)|united\s*states|america|🇭🇰|香港|(^|[^a-z])hkg?([^a-z]|$)|hong\s*kong|🇯🇵|日本|东京|東京|大阪|(^|[^a-z])jpn?([^a-z]|$)|japan|🇹🇼|台湾|台灣|臺灣|台北|臺北|高雄|(^|[^a-z])twn?([^a-z]|$)|taiwan|🇸🇬|新加坡|狮城|獅城|(^|[^a-z])sgp?([^a-z]|$)|singapore)'
+    empty-fallback: 'REJECT'
+
+  - name: '自动选择'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
+    hidden: true
+    type: 'url-test'
+    use: ["机场订阅"]
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 600
+    timeout: 5000
+    tolerance: 150
+    lazy: true
+    empty-fallback: 'REJECT'
+
+  - name: '美国-自动选择'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
+    hidden: true
+    type: 'url-test'
+    use: ["机场订阅"]
+    filter: '(?i)(🇺🇸|美国|美國|洛杉矶|洛杉磯|纽约|紐約|西雅图|西雅圖|圣何塞|旧金山|舊金山|(^|[^a-z])usa?([^a-z]|$)|united\s*states|america)'
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 600
+    timeout: 5000
+    tolerance: 150
+    lazy: true
+    empty-fallback: 'REJECT'
+
+  - name: '香港-自动选择'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
+    hidden: true
+    type: 'url-test'
+    use: ["机场订阅"]
+    filter: '(?i)(🇭🇰|香港|(^|[^a-z])hkg?([^a-z]|$)|hong\s*kong)'
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 600
+    timeout: 5000
+    tolerance: 150
+    lazy: true
+    empty-fallback: 'REJECT'
+
+  - name: '日本-自动选择'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
+    hidden: true
+    type: 'url-test'
+    use: ["机场订阅"]
+    filter: '(?i)(🇯🇵|日本|东京|東京|大阪|(^|[^a-z])jpn?([^a-z]|$)|japan)'
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 600
+    timeout: 5000
+    tolerance: 150
+    lazy: true
+    empty-fallback: 'REJECT'
+
+  - name: '台湾-自动选择'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
+    hidden: true
+    type: 'url-test'
+    use: ["机场订阅"]
+    filter: '(?i)(🇹🇼|台湾|台灣|臺灣|台北|臺北|高雄|(^|[^a-z])twn?([^a-z]|$)|taiwan)'
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 600
+    timeout: 5000
+    tolerance: 150
+    lazy: true
+    empty-fallback: 'REJECT'
+
+  - name: '新加坡-自动选择'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
+    hidden: true
+    type: 'url-test'
+    use: ["机场订阅"]
+    filter: '(?i)(🇸🇬|新加坡|狮城|獅城|(^|[^a-z])sgp?([^a-z]|$)|singapore)'
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 600
+    timeout: 5000
+    tolerance: 150
+    lazy: true
+    empty-fallback: 'REJECT'
+
+# MRS 规则每日更新。经代理下载，避免首次直连 GitHub 失败。
+rule-providers:
+  ads_domain:
+    type: http
+    behavior: domain
+    format: text
+    url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.list'
+    path: ./rule_provider/ads_domain.list
+    interval: 86400
+    proxy: 国外代理
+  ai_domain:
+    type: http
+    behavior: domain
+    format: text
+    url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.list'
+    path: ./rule_provider/ai_domain.list
+    interval: 86400
+    proxy: 国外代理
+  tg_domain:
+    type: http
+    behavior: domain
+    format: text
+    url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.list'
+    path: ./rule_provider/tg_domain.list
+    interval: 86400
+    proxy: 国外代理
+  tg_ip:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.list'
+    path: ./rule_provider/tg_ip.list
+    interval: 86400
+    proxy: 国外代理
+  # 内置常见 Google/YouTube 域名，启动时无需另行下载。
+  google_domain:
+    type: inline
+    behavior: domain
+    payload:
+      - '+.google.com'
+      - '+.google.com.hk'
+      - '+.google.co.jp'
+      - '+.google.com.tw'
+      - '+.google.com.sg'
+      - '+.google.co.uk'
+      - '+.google.de'
+      - '+.google.fr'
+      - '+.google.ca'
+      - '+.google.com.au'
+      - '+.gstatic.com'
+      - '+.googleapis.com'
+      - '+.googleusercontent.com'
+      - '+.googlevideo.com'
+      - '+.ggpht.com'
+      - '+.youtube.com'
+      - '+.youtu.be'
+      - '+.ytimg.com'
+      - '+.gmail.com'
+  cn_domain:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs
+    path: ./rule_provider/cn_domain.mrs
+    interval: 86400
+    proxy: 国外代理
+  cn_ip:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs
+    path: ./rule_provider/cn_ip.mrs
+    interval: 86400
+    proxy: 国外代理
+
+rules:
+  # 仅对进入核心的 DNS 有效；BoxProxy 还须接管手机和热点的 TCP/UDP 53。
+  - DST-PORT,53,DNS_Hijack
+  # 阻止进入核心的常见 DoT/DoQ 端口；应用内 DoH 需在应用中关闭。
+  - DST-PORT,853,REJECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN,localhost,DIRECT
+  - IP-CIDR,0.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,224.0.0.0/4,DIRECT,no-resolve
+  - IP-CIDR6,::1/128,DIRECT,no-resolve
+  - IP-CIDR6,fc00::/7,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+  # PASS 表示关闭去广告并继续匹配后续规则，不会强制直连。
+  - RULE-SET,ads_domain,去广告
+  # Google 兼容处理：拒绝匹配域名的 UDP/443，供支持回退的客户端改用 TCP。
+  # 若要恢复这些域名的 QUIC，注释下一行即可。
+  - AND,((NETWORK,UDP),(DST-PORT,443),(RULE-SET,google_domain)),REJECT
+  # AI 在 Google 前匹配，Gemini/AI Studio 使用 AI 出口。
+  - RULE-SET,ai_domain,AI
+  - RULE-SET,tg_domain,Telegram
+  - RULE-SET,tg_ip,Telegram,no-resolve
+  - RULE-SET,google_domain,Google
+  - RULE-SET,cn_domain,DIRECT
+  - RULE-SET,cn_ip,DIRECT,no-resolve
+  - MATCH,国外代理
