@@ -1,5 +1,21 @@
 # BoxProxy / Mihomo：国内外分流、IPv6、热点共享
 # 使用前替换 proxy-providers 中的订阅链接。
+
+proxy-providers:
+  机场订阅:
+    type: http
+    url: '在此填入订阅链接'
+    exclude-filter: '(?i)(剩余|到期|过期|流量|订阅|官网|客服|套餐|公告|重置|traffic|expire)'
+    path: ./proxy_provider/my_subscription.yaml
+    interval: 86400
+    proxy: DIRECT
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 600
+      timeout: 5000
+      lazy: true
+
 mixed-port: 7890
 redir-port: 9797
 tproxy-port: 9898
@@ -85,21 +101,6 @@ dns:
   nameserver:
     - 'https://1.1.1.1/dns-query#国外代理'
     - 'https://8.8.8.8/dns-query#国外代理'
-
-proxy-providers:
-  机场订阅:
-    type: http
-    url: '在此填入订阅链接'
-    exclude-filter: '(?i)(剩余|到期|过期|流量|订阅|官网|客服|套餐|公告|重置|traffic|expire)'
-    path: ./proxy_provider/my_subscription.yaml
-    interval: 86400
-    proxy: DIRECT
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 600
-      timeout: 5000
-      lazy: true
 
 proxies:
   - name: DNS_Hijack
