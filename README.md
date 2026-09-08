@@ -12,7 +12,7 @@
 https://raw.githubusercontent.com/piwric77/mihomo-boxproxy-config/main/config.yaml
 ```
 
-这是配置模板地址，节点订阅需下载后自行填入。私有仓库需登录有权限的 GitHub 账号下载；上面的 Raw 地址不能直接用于未授权客户端的自动订阅。浏览器打开文件后可点击「Download raw file」保存。
+仓库已公开，以上链接可直接复制或免登录下载。这是配置模板地址，使用前需将「在此填入订阅链接」替换为自己的节点订阅；不要将含有私人订阅链接的配置提交到公开仓库。
 
 ## 使用
 
