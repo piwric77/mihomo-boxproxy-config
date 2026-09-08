@@ -2,6 +2,18 @@
 
 国内直连、国外分流，支持 IPv4/IPv6、地区自动选择、Google / AI / Telegram 独立策略及域名去广告。
 
+## 配置下载链接
+
+[打开配置文件并下载](https://github.com/piwric77/mihomo-boxproxy-config/blob/main/config.yaml) · [Raw 配置文件](https://github.com/piwric77/mihomo-boxproxy-config/raw/refs/heads/main/config.yaml)
+
+可复制的配置地址：
+
+```text
+https://raw.githubusercontent.com/piwric77/mihomo-boxproxy-config/main/config.yaml
+```
+
+这是配置模板地址，节点订阅需下载后自行填入。私有仓库需登录有权限的 GitHub 账号下载；上面的 Raw 地址不能直接用于未授权客户端的自动订阅。浏览器打开文件后可点击「Download raw file」保存。
+
 ## 使用
 
 1. 下载 `config.yaml`，将 `在此填入订阅链接` 替换为 Clash/Mihomo 格式的节点订阅链接。
