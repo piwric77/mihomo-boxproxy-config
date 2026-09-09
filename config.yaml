@@ -12,7 +12,7 @@ proxy-providers:
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
-      interval: 600
+      interval: 180
       timeout: 5000
       lazy: true
 
@@ -190,7 +190,7 @@ proxy-groups:
     type: 'url-test'
     use: ["机场订阅"]
     url: 'https://www.gstatic.com/generate_204'
-    interval: 600
+    interval: 180
     timeout: 5000
     tolerance: 150
     lazy: true
@@ -203,7 +203,7 @@ proxy-groups:
     use: ["机场订阅"]
     filter: '(?i)(🇺🇸|美国|美國|洛杉矶|洛杉磯|纽约|紐約|西雅图|西雅圖|圣何塞|旧金山|舊金山|(^|[^a-z])usa?([^a-z]|$)|united\s*states|america)'
     url: 'https://www.gstatic.com/generate_204'
-    interval: 600
+    interval: 180
     timeout: 5000
     tolerance: 150
     lazy: true
@@ -216,7 +216,7 @@ proxy-groups:
     use: ["机场订阅"]
     filter: '(?i)(🇭🇰|香港|(^|[^a-z])hkg?([^a-z]|$)|hong\s*kong)'
     url: 'https://www.gstatic.com/generate_204'
-    interval: 600
+    interval: 180
     timeout: 5000
     tolerance: 150
     lazy: true
@@ -229,7 +229,7 @@ proxy-groups:
     use: ["机场订阅"]
     filter: '(?i)(🇯🇵|日本|东京|東京|大阪|(^|[^a-z])jpn?([^a-z]|$)|japan)'
     url: 'https://www.gstatic.com/generate_204'
-    interval: 600
+    interval: 180
     timeout: 5000
     tolerance: 150
     lazy: true
@@ -242,7 +242,7 @@ proxy-groups:
     use: ["机场订阅"]
     filter: '(?i)(🇹🇼|台湾|台灣|臺灣|台北|臺北|高雄|(^|[^a-z])twn?([^a-z]|$)|taiwan)'
     url: 'https://www.gstatic.com/generate_204'
-    interval: 600
+    interval: 180
     timeout: 5000
     tolerance: 150
     lazy: true
@@ -255,7 +255,7 @@ proxy-groups:
     use: ["机场订阅"]
     filter: '(?i)(🇸🇬|新加坡|狮城|獅城|(^|[^a-z])sgp?([^a-z]|$)|singapore)'
     url: 'https://www.gstatic.com/generate_204'
-    interval: 600
+    interval: 180
     timeout: 5000
     tolerance: 150
     lazy: true
