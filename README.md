@@ -45,6 +45,14 @@ BoxProxy 首页「延迟目标」需要在 App 内单独保存，建议填写：
 
 首页测试与节点健康检查是不同入口。Cloudflare 和 Google 使用轻量检测地址；Baidu 保留网站连通性对照。对比配置时请固定同一节点、同一目标和网络，连续测数次观察中位数。修改目标后的数值不能与原网站首页直接比较。自动切换容差不会平滑首页显示的延迟。
 
+## FCM 推送
+
+FCM 策略默认跟随 Google，可单独选择固定节点或 DIRECT；推送连接及注册域名优先于通用 Google、广告规则匹配。固定节点有助于减少出口切换引起的重连，直连是否可用取决于网络。
+
+BoxProxy 的接管范围需包含 Google Play 服务，允许 TCP 5228–5230 和 HTTPS 443；配置按域名分流，不将这些端口的所有应用流量都归入 FCM。系统后台限制、节点断线和模块是否接管也会影响推送，策略组不能保证通知即时送达。
+
+参考：[Firebase 网络要求](https://firebase.google.com/docs/cloud-messaging/network-configuration)。
+
 ## 参考
 
 - [Mihomo 文档](https://wiki.metacubex.one/)
