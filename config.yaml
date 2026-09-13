@@ -86,6 +86,9 @@ dns:
     - https://223.5.5.5/dns-query#DIRECT
     - https://1.12.12.12/dns-query#DIRECT
   nameserver-policy:
+    'rule-set:fcm_domain':
+      - 'https://1.1.1.1/dns-query#FCM'
+      - 'https://8.8.8.8/dns-query#FCM'
     'rule-set:ai_domain':
       - 'https://1.1.1.1/dns-query#AI'
       - 'https://8.8.8.8/dns-query#AI'
@@ -116,6 +119,13 @@ proxy-groups:
     type: select
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png'
     proxies: ['国外代理', '美国', '香港', '日本', '台湾', '新加坡', '手动选择']
+
+  - name: 'FCM'
+    type: select
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google.png'
+    proxies: ['Google', '国外代理', 'DIRECT', '美国', '香港', '日本', '台湾', '新加坡']
+    use: ['机场订阅']
+    empty-fallback: REJECT
 
   - name: 'AI'
     type: select
@@ -262,6 +272,29 @@ proxy-groups:
     empty-fallback: 'REJECT'
 
 rule-providers:
+  fcm_domain:
+    type: inline
+    behavior: domain
+    payload:
+      - 'mtalk.google.com'
+      - 'mtalk4.google.com'
+      - 'mtalk-staging.google.com'
+      - 'mtalk-dev.google.com'
+      - 'alt1-mtalk.google.com'
+      - 'alt2-mtalk.google.com'
+      - 'alt3-mtalk.google.com'
+      - 'alt4-mtalk.google.com'
+      - 'alt5-mtalk.google.com'
+      - 'alt6-mtalk.google.com'
+      - 'alt7-mtalk.google.com'
+      - 'alt8-mtalk.google.com'
+      - 'android.apis.google.com'
+      - 'device-provisioning.googleapis.com'
+      - 'firebaseinstallations.googleapis.com'
+      - 'fcm.googleapis.com'
+      - 'fcmregistrations.googleapis.com'
+      - 'iid.googleapis.com'
+      - 'android.clients.google.com'
   ads_domain:
     type: http
     behavior: domain
@@ -352,6 +385,7 @@ rules:
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
   - IP-CIDR6,ff00::/8,DIRECT,no-resolve
+  - RULE-SET,fcm_domain,FCM
   - RULE-SET,ads_domain,去广告
   - AND,((NETWORK,UDP),(DST-PORT,443),(RULE-SET,google_domain)),REJECT
   - RULE-SET,ai_domain,AI
