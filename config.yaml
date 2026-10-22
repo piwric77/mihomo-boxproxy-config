@@ -149,11 +149,6 @@ proxy-groups:
     use: ['机场订阅']
     empty-fallback: REJECT
 
-  - name: '去广告'
-    type: select
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/AdBlack.png'
-    proxies: [REJECT, PASS]
-
   - name: '美国'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
     type: 'select'
@@ -318,14 +313,6 @@ rule-providers:
       - 'fcmregistrations.googleapis.com'
       - 'iid.googleapis.com'
       - 'android.clients.google.com'
-  ads_domain:
-    type: http
-    behavior: domain
-    format: text
-    url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.list'
-    path: ./rule_provider/ads_domain.list
-    interval: 86400
-    proxy: 国外代理
   ai_domain:
     type: http
     behavior: domain
@@ -410,7 +397,6 @@ rules:
   - IP-CIDR6,ff00::/8,DIRECT,no-resolve
   - RULE-SET,fcm_domain,FCM
   - RULE-SET,apple_domain,Apple
-  - RULE-SET,ads_domain,去广告
   - AND,((NETWORK,UDP),(DST-PORT,443),(RULE-SET,google_domain)),REJECT
   - RULE-SET,ai_domain,AI
   - RULE-SET,tg_domain,Telegram
