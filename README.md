@@ -45,6 +45,18 @@ BoxProxy 首页「延迟目标」需要在 App 内单独保存，建议填写：
 
 首页测试与节点健康检查是不同入口。Cloudflare 和 Google 使用轻量检测地址；Baidu 保留网站连通性对照。对比配置时请固定同一节点、同一目标和网络，连续测数次观察中位数。修改目标后的数值不能与原网站首页直接比较。自动切换容差不会平滑首页显示的延迟。
 
+## 去广告与自定义规则
+
+配置内置 MetaCubeX 的 category-ads-all 域名规则，每日更新。去广告组默认首项为 REJECT；改成 REJECT-DROP 可静默丢弃，改成 PASS 可临时关闭所有广告拦截，便于排查误拦。
+
+在 rule-providers 中编辑三个内置列表的 payload：
+
+- custom_direct：强制直连，优先于广告规则。
+- custom_proxy：强制走“国外代理”，优先于广告规则。
+- custom_block：交给“去广告”组处理，用于自行补充拦截域名。
+
+示例：将 payload: [] 改为 payload:，并在下一行加入 - '+.example.com'。每行写一个域名；+.example.com 匹配该域名及子域名。修改后在 BoxProxy 重载配置；若应用异常，先把“去广告”切到 PASS，再删除或调整对应规则。
+
 ## FCM 推送
 
 FCM 策略默认跟随 Google，可单独选择固定节点或 DIRECT；推送连接及注册域名优先于通用 Google 规则匹配。固定节点有助于减少出口切换引起的重连，直连是否可用取决于网络。
