@@ -318,15 +318,6 @@ rule-providers:
       - 'fcmregistrations.googleapis.com'
       - 'iid.googleapis.com'
       - 'android.clients.google.com'
-  # AdGuard 官方规则需转换为 Mihomo 格式；下列 MRS 的上游包含 AdGuard DNS/Base/Chinese/Mobile。
-  adguard_domain:
-    type: http
-    behavior: domain
-    format: mrs
-    url: 'https://github.com/217heidai/adblockfilters/releases/download/rule/adblockmihomo.mrs'
-    path: ./rule_provider/adguard.mrs
-    interval: 28800
-    proxy: 国外代理
   # 秋风官方“仅广告”MRS：不拦截其隐私统计和不受欢迎分类，减少对推送/更新的影响。
   awa_ads:
     type: http
@@ -418,7 +409,6 @@ rules:
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
   - IP-CIDR6,ff00::/8,DIRECT,no-resolve
-  - RULE-SET,adguard_domain,去广告
   - RULE-SET,awa_ads,去广告
   - RULE-SET,fcm_domain,FCM
   - RULE-SET,apple_domain,Apple
