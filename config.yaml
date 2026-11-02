@@ -318,28 +318,22 @@ rule-providers:
       - 'fcmregistrations.googleapis.com'
       - 'iid.googleapis.com'
       - 'android.clients.google.com'
-  # 自定义规则：将 payload: [] 改为多行列表，例如：
-  # payload:
-  #   - '+.example.com'
-  # 自定义规则优先于内置广告规则。
-  custom_direct:
-    type: inline
-    behavior: domain
-    payload: []
-  custom_proxy:
-    type: inline
-    behavior: domain
-    payload: []
-  custom_block:
-    type: inline
-    behavior: domain
-    payload: []
-  ads_domain:
+  # AdGuard 官方规则需转换为 Mihomo 格式；下列 MRS 的上游包含 AdGuard DNS/Base/Chinese/Mobile。
+  adguard_domain:
     type: http
     behavior: domain
     format: mrs
-    url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs'
-    path: ./rule_provider/category-ads-all.mrs
+    url: 'https://github.com/217heidai/adblockfilters/releases/download/rule/adblockmihomo.mrs'
+    path: ./rule_provider/adguard.mrs
+    interval: 28800
+    proxy: 国外代理
+  # 秋风官方“仅广告”MRS：不拦截其隐私统计和不受欢迎分类，减少对推送/更新的影响。
+  awa_ads:
+    type: http
+    behavior: domain
+    format: mrs
+    url: 'https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash-Only.Ads.mrs'
+    path: ./rule_provider/awavenue-ads-only.mrs
     interval: 86400
     proxy: 国外代理
   ai_domain:
@@ -424,10 +418,8 @@ rules:
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
   - IP-CIDR6,ff00::/8,DIRECT,no-resolve
-  - RULE-SET,custom_direct,DIRECT
-  - RULE-SET,custom_proxy,国外代理
-  - RULE-SET,custom_block,去广告
-  - RULE-SET,ads_domain,去广告
+  - RULE-SET,adguard_domain,去广告
+  - RULE-SET,awa_ads,去广告
   - RULE-SET,fcm_domain,FCM
   - RULE-SET,apple_domain,Apple
   - AND,((NETWORK,UDP),(DST-PORT,443),(RULE-SET,google_domain)),REJECT
