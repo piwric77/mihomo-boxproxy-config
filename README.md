@@ -49,12 +49,7 @@ BoxProxy 首页「延迟目标」需要在 App 内单独保存，建议填写：
 
 去广告组保留 REJECT、REJECT-DROP 和 PASS 三种模式；默认 REJECT。改成 REJECT-DROP 可静默丢弃，改成 PASS 可临时关闭全部广告拦截，用于排查误拦。
 
-规则来源：
-
-- AdGuard：使用 217heidai 提供的 Mihomo MRS。其上游包含 AdGuard DNS、Base、Chinese 和 Mobile Ads 等官方过滤器，并以 8 小时为周期更新。
-- 秋风广告规则：使用 TG-Twilight 官方“仅广告”MRS，每日更新；该版本不包含隐私统计及“不受欢迎”分类，减少对推送和应用更新的干扰。
-
-AdGuard 官方 filter.txt 使用 Adblock 语法，不能被 Mihomo 规则提供者直接解析，因此配置使用其上游来源的 Mihomo 兼容 MRS，而非加载原始 filter.txt。两条规则可能有少量重复，按顺序命中后即停止，不会重复拦截。
+仅使用秋风广告规则（TG-Twilight）官方“仅广告”MRS，每日更新。此版本不包含隐私统计及“不受欢迎”分类，减少对 FCM 推送、应用更新和正常服务的干扰。
 
 ## FCM 推送
 
