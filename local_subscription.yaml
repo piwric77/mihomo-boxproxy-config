@@ -1,0 +1,4 @@
+# 本地订阅节点模板
+# 将本文件放至 Mihomo 配置目录：proxy_provider/local_subscription.yaml
+# 删除示例注释后，按 Mihomo 节点格式添加自己的节点。
+proxies: []
