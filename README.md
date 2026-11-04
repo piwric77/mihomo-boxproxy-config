@@ -12,25 +12,32 @@
 https://raw.githubusercontent.com/piwric77/mihomo-boxproxy-config/main/config.yaml
 ```
 
-仓库已公开，以上链接可直接复制或免登录下载。这是配置模板地址，使用前需将「在此填入订阅链接」替换为自己的节点订阅；不要将含有私人订阅链接的配置提交到公开仓库。
+仓库已公开，以上链接可直接复制或免登录下载。BoxProxy 用户在应用的订阅管理填写自己的链接即可，无需将私人订阅链接写进或提交到配置文件。
+
+## BoxProxy 订阅管理
+
+导入本配置后，打开 BoxProxy 的“订阅管理”，开启“订阅配置覆写”。保持订阅路径为 proxy_provider，名称可任意填写，下载代理选 DIRECT，User-Agent 使用 ClashMeta；在“链接”粘贴你的订阅并保存。配置的节点组使用 include-all 自动收集 BoxProxy 写入的全部 Provider，因此不需要再编辑 config.yaml。
+
+建议保持 Provider 更新间隔 86400 秒；健康检查可使用 https://cp.cloudflare.com，间隔设为 180 或 300 秒。保存后更新订阅并重载 Mihomo。
 
 ## 本地订阅
 
-除“机场订阅”外，配置还会载入 ./proxy_provider/local_subscription.yaml。该文件使用 Mihomo 的代理提供者格式，内容必须以 proxies: 开头；远程和本地节点会同时出现在地区、手动和自动选择组中。
+配置会载入 ./proxy_provider/local_subscription.yaml。该文件使用 Mihomo 的代理提供者格式，内容必须以 proxies: 开头；BoxProxy 管理的远程订阅和本地节点会同时出现在地区、手动和自动选择组中。
 
 仓库提供 [本地订阅模板](https://github.com/piwric77/mihomo-boxproxy-config/blob/main/local_subscription.yaml)。将模板复制到 Mihomo 配置目录的 proxy_provider/local_subscription.yaml，填写节点后重载配置即可。若客户端不允许写入这个路径，请使用该客户端的本地配置导入功能，而不是修改远程订阅。
 
 ## Bettbox
 
-Bettbox 使用 Mihomo 内核，可直接导入本仓库的 config.yaml。在 Bettbox 中选择 Mihomo，导入配置后在应用内开启 TUN；不要启用会覆盖配置 DNS 的额外 DNS 覆写。需要本地节点时，将 local_subscription.yaml 放到 Bettbox 当前配置的 proxy_provider 目录，再重载配置。
+Bettbox 使用 Mihomo 内核，可直接导入本仓库的 config.yaml。在 Bettbox 中选择 Mihomo 并在应用内开启 TUN；不要启用会覆盖配置 DNS 的额外 DNS 覆写。策略组自动收集 Bettbox 当前配置中的所有 Provider。需要本地节点时，将 local_subscription.yaml 放到 Bettbox 当前配置的 proxy_provider 目录，再重载配置。
 
 热点共享时，之前设备截图显示接口为 wlan2，请在 BoxProxy 的“共享网络接口”选择它。Bettbox 的热点或网络共享接口由系统平台决定，配置本身不指定接口。
 
 ## 使用
 
-1. 下载 `config.yaml`，将 `在此填入订阅链接` 替换为 Clash/Mihomo 格式的节点订阅链接。
-2. 在 BoxProxy 中导入，选择 Mihomo + TProxy，开启核心配置同步、IPv6 及 TCP/UDP、DNS 接管，重启服务。
-3. 更新订阅和规则，在「国外代理」或各服务分组中选择节点。
+1. 下载或导入 `config.yaml`。
+2. BoxProxy 用户在“订阅管理”填写链接并开启“订阅配置覆写”；Bettbox 用户导入后添加自己的 Provider。
+3. 在 BoxProxy 选择 Mihomo + TProxy，开启核心配置同步、IPv6 及 TCP/UDP、DNS 接管，重启服务。
+4. 更新订阅和规则，在「国外代理」或各服务分组中选择节点。
 
 IPv6 需要模块接管本机和热点的 IPv6 流量；运行配置中的全局 `ipv6` 和 `dns.ipv6` 应均为 `true`。eBPF 由 BoxProxy 管理，需设备内核及模块支持，YAML 本身不负责启用。
 
