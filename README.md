@@ -14,6 +14,18 @@ https://raw.githubusercontent.com/piwric77/mihomo-boxproxy-config/main/config.ya
 
 仓库已公开，以上链接可直接复制或免登录下载。这是配置模板地址，使用前需将「在此填入订阅链接」替换为自己的节点订阅；不要将含有私人订阅链接的配置提交到公开仓库。
 
+## 本地订阅
+
+除“机场订阅”外，配置还会载入 ./proxy_provider/local_subscription.yaml。该文件使用 Mihomo 的代理提供者格式，内容必须以 proxies: 开头；远程和本地节点会同时出现在地区、手动和自动选择组中。
+
+仓库提供 [本地订阅模板](https://github.com/piwric77/mihomo-boxproxy-config/blob/main/local_subscription.yaml)。将模板复制到 Mihomo 配置目录的 proxy_provider/local_subscription.yaml，填写节点后重载配置即可。若客户端不允许写入这个路径，请使用该客户端的本地配置导入功能，而不是修改远程订阅。
+
+## Bettbox
+
+Bettbox 使用 Mihomo 内核，可直接导入本仓库的 config.yaml。在 Bettbox 中选择 Mihomo，导入配置后在应用内开启 TUN；不要启用会覆盖配置 DNS 的额外 DNS 覆写。需要本地节点时，将 local_subscription.yaml 放到 Bettbox 当前配置的 proxy_provider 目录，再重载配置。
+
+热点共享时，之前设备截图显示接口为 wlan2，请在 BoxProxy 的“共享网络接口”选择它。Bettbox 的热点或网络共享接口由系统平台决定，配置本身不指定接口。
+
 ## 使用
 
 1. 下载 `config.yaml`，将 `在此填入订阅链接` 替换为 Clash/Mihomo 格式的节点订阅链接。
