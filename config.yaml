@@ -1,21 +1,7 @@
 # BoxProxy / Mihomo：国内外分流、IPv6、热点共享
-# 使用前替换 proxy-providers 中的订阅链接。
+# BoxProxy：在“订阅管理”开启“订阅配置覆写”并填写订阅链接。\r\n# 策略组自动收集任何 Provider，无需在此文件填写远程订阅。
 
 proxy-providers:
-  机场订阅:
-    type: http
-    url: '在此填入订阅链接'
-    exclude-filter: '(?i)(剩余|到期|过期|流量|订阅|官网|客服|套餐|公告|重置|traffic|expire)'
-    path: ./proxy_provider/my_subscription.yaml
-    interval: 86400
-    proxy: DIRECT
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 180
-      timeout: 5000
-      lazy: true
-
   本地订阅:
     type: file
     path: ./proxy_provider/local_subscription.yaml
@@ -168,47 +154,47 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
     type: 'select'
     proxies: ["美国-自动选择"]
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇺🇸|美国|美國|洛杉矶|洛杉磯|纽约|紐約|西雅图|西雅圖|圣何塞|旧金山|舊金山|(^|[^a-z])usa?([^a-z]|$)|united\s*states|america)'
 
   - name: '香港'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png'
     type: 'select'
     proxies: ["香港-自动选择"]
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇭🇰|香港|(^|[^a-z])hkg?([^a-z]|$)|hong\s*kong)'
 
   - name: '日本'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png'
     type: 'select'
     proxies: ["日本-自动选择"]
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇯🇵|日本|东京|東京|大阪|(^|[^a-z])jpn?([^a-z]|$)|japan)'
 
   - name: '台湾'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png'
     type: 'select'
     proxies: ["台湾-自动选择"]
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇹🇼|台湾|台灣|臺灣|台北|臺北|高雄|(^|[^a-z])twn?([^a-z]|$)|taiwan)'
 
   - name: '新加坡'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png'
     type: 'select'
     proxies: ["新加坡-自动选择"]
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇸🇬|新加坡|狮城|獅城|(^|[^a-z])sgp?([^a-z]|$)|singapore)'
 
   - name: '手动选择'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png'
     type: 'select'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     empty-fallback: 'REJECT'
 
   - name: '其他节点'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/World_Map.png'
     type: 'select'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     exclude-filter: '(?i)(🇺🇸|美国|美國|洛杉矶|洛杉磯|纽约|紐約|西雅图|西雅圖|圣何塞|旧金山|舊金山|(^|[^a-z])usa?([^a-z]|$)|united\s*states|america|🇭🇰|香港|(^|[^a-z])hkg?([^a-z]|$)|hong\s*kong|🇯🇵|日本|东京|東京|大阪|(^|[^a-z])jpn?([^a-z]|$)|japan|🇹🇼|台湾|台灣|臺灣|台北|臺北|高雄|(^|[^a-z])twn?([^a-z]|$)|taiwan|🇸🇬|新加坡|狮城|獅城|(^|[^a-z])sgp?([^a-z]|$)|singapore)'
     empty-fallback: 'REJECT'
 
@@ -216,7 +202,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
     hidden: true
     type: 'url-test'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     url: 'https://www.gstatic.com/generate_204'
     interval: 180
     timeout: 5000
@@ -228,7 +214,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
     hidden: true
     type: 'url-test'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇺🇸|美国|美國|洛杉矶|洛杉磯|纽约|紐約|西雅图|西雅圖|圣何塞|旧金山|舊金山|(^|[^a-z])usa?([^a-z]|$)|united\s*states|america)'
     url: 'https://www.gstatic.com/generate_204'
     interval: 180
@@ -241,7 +227,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
     hidden: true
     type: 'url-test'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇭🇰|香港|(^|[^a-z])hkg?([^a-z]|$)|hong\s*kong)'
     url: 'https://www.gstatic.com/generate_204'
     interval: 180
@@ -254,7 +240,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
     hidden: true
     type: 'url-test'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇯🇵|日本|东京|東京|大阪|(^|[^a-z])jpn?([^a-z]|$)|japan)'
     url: 'https://www.gstatic.com/generate_204'
     interval: 180
@@ -267,7 +253,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
     hidden: true
     type: 'url-test'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇹🇼|台湾|台灣|臺灣|台北|臺北|高雄|(^|[^a-z])twn?([^a-z]|$)|taiwan)'
     url: 'https://www.gstatic.com/generate_204'
     interval: 180
@@ -280,7 +266,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
     hidden: true
     type: 'url-test'
-    use: ["机场订阅", "本地订阅"]
+    include-all: true
     filter: '(?i)(🇸🇬|新加坡|狮城|獅城|(^|[^a-z])sgp?([^a-z]|$)|singapore)'
     url: 'https://www.gstatic.com/generate_204'
     interval: 180
